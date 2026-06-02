@@ -98,6 +98,47 @@ def find_connected_components(adjacency_list: Dict[str, Set[str]]) -> list[Set[s
     return components
 
 
+def detect_xor_cut(adjacency_list: Dict[str, Set[str]]) -> list[Set[str]] | None:
+    """Detect XOR cut by checking if graph has multiple connected components."""
+    components = find_connected_components(adjacency_list)
+    return components if len(components) > 1 else None
+
+
+def detect_sequence_cut(adjacency_list: Dict[str, Set[str]]) -> list[Set[str]] | None:
+    """Detect sequence cut by finding a valid topological split of activities."""
+    all_activities: Set[str] = set(adjacency_list.keys())
+    for targets in adjacency_list.values():
+        all_activities.update(targets)
+    
+    if len(all_activities) <= 1:
+        return None
+    
+    activity_neighbors = compute_activity_neighbors(adjacency_list)
+    starts = {a for a in all_activities if len(activity_neighbors[a][0]) == 0}
+    ends = {a for a in all_activities if len(activity_neighbors[a][1]) == 0}
+    
+    if not starts or not ends:
+        return None
+    
+    ordered: list[Set[str]] = []
+    remaining = set(all_activities)
+    
+    while remaining:
+        current_layer = set()
+        for activity in remaining:
+            preds = activity_neighbors[activity][0]
+            if preds.issubset(set().union(*ordered)):
+                current_layer.add(activity)
+        
+        if not current_layer:
+            return None
+        
+        ordered.append(current_layer)
+        remaining -= current_layer
+    
+    return ordered if len(ordered) > 1 else None
+
+
 def discover_inductive_model(event_log: pd.DataFrame) -> Dict[str, Any]:
     """Discover process model from event log using inductive miner."""
     start_set, end_set = extract_start_end_activities(event_log)
@@ -135,3 +176,54 @@ def save_model_summary(model: Dict[str, Any], output_path: str) -> None:
     summary = summarize_model(model)
     with open(output_path, 'w') as f:
         json.dump(summary, f, indent=2)
+
+
+def make_activity_node(activity: str) -> Dict[str, Any]:
+    """Create an activity leaf node."""
+    return {'type': 'activity', 'name': activity}
+
+
+def make_xor_node(*children: Dict[str, Any]) -> Dict[str, Any]:
+    """Create an XOR (exclusive choice) operator node."""
+    return {'type': 'xor', 'children': list(children)}
+
+
+def make_sequence_node(*children: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a sequence (->) operator node."""
+    return {'type': 'sequence', 'children': list(children)}
+
+
+def make_parallel_node(*children: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a parallel (||) operator node."""
+    return {'type': 'parallel', 'children': list(children)}
+
+
+def make_flower_node(*children: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a flower (loop) operator node."""
+    return {'type': 'flower', 'children': list(children)}
+
+
+if __name__ == "__main__":
+    # Create test event log with pm4py-style column names
+    df = pd.DataFrame({
+        'case:concept:name': ['Case1', 'Case1', 'Case1', 'Case2', 'Case2'],
+        'concept:name': ['A', 'B', 'C', 'X', 'Y'],
+        'time:timestamp': pd.to_datetime([
+            '2024-01-01 09:00:00',
+            '2024-01-01 10:00:00',
+            '2024-01-01 11:00:00',
+            '2024-01-01 09:30:00',
+            '2024-01-01 10:30:00'
+        ])
+    })
+    
+    # Discover model
+    model = discover_inductive_model(df)
+    
+    # Get summary
+    summary = summarize_model(model)
+    
+    # Print summary
+    print("Inductive Miner Summary:")
+    for key, value in summary.items():
+        print(f"  {key}: {value}")
