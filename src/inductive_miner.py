@@ -1,6 +1,7 @@
-from typing import Dict, Set, Tuple
+from typing import Dict, Set, Tuple, Any
 import pandas as pd
 
+import json
 
 def extract_start_end_activities(event_log: pd.DataFrame) -> Tuple[Set[str], Set[str]]:
     """
@@ -162,3 +163,77 @@ def find_connected_components(adjacency_list: Dict[str, Set[str]]) -> list[Set[s
             components.append(component)
     
     return components
+
+
+
+
+def discover_inductive_model(event_log: pd.DataFrame) -> Dict[str, Any]:
+    """
+    Discover process model from event log using inductive miner.
+    
+    Parameters
+    ----------
+    event_log : pd.DataFrame
+        Event log with 'case_id', 'activity', and 'timestamp' columns.
+        
+    Returns
+    -------
+    Dict[str, Any]
+        Process model representation (incomplete implementation).
+    """
+    start_set, end_set = extract_start_end_activities(event_log)
+    relations = compute_directly_follows_relations(event_log)
+    adj_list = build_adjacency_list(relations)
+    activity_neighbors = compute_activity_neighbors(adj_list)
+    components = find_connected_components(adj_list)
+    
+    return {
+        'start_activities': start_set,
+        'end_activities': end_set,
+        'relations': relations,
+        'adjacency_list': adj_list,
+        'activity_neighbors': activity_neighbors,
+        'connected_components': components
+    }
+
+
+def summarize_model(model: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Create summary statistics for discovered model.
+    
+    Parameters
+    ----------
+    model : Dict[str, Any]
+        Process model from discover_inductive_model().
+        
+    Returns
+    -------
+    Dict[str, Any]
+        Summary dictionary with model metrics.
+    """
+    return {
+        'algorithm': 'Inductive Miner',
+        'num_start_activities': len(model['start_activities']),
+        'num_end_activities': len(model['end_activities']),
+        'num_relations': len(model['relations']),
+        'num_activities': len(model['adjacency_list']),
+        'num_components': len(model['connected_components']),
+        'components': [list(c) for c in model['connected_components']],
+        'implementation_status': 'partial graph-based inductive miner implementation'
+    }
+
+
+def save_model_summary(model: Dict[str, Any], output_path: str) -> None:
+    """
+    Save model summary to JSON file.
+    
+    Parameters
+    ----------
+    model : Dict[str, Any]
+        Process model from discover_inductive_model().
+    output_path : str
+        Path to output JSON file.
+    """
+    summary = summarize_model(model)
+    with open(output_path, 'w') as f:
+        json.dump(summary, f, indent=2)
