@@ -146,6 +146,8 @@ def discover_inductive_model(event_log: pd.DataFrame) -> Dict[str, Any]:
     adj_list = build_adjacency_list(relations)
     activity_neighbors = compute_activity_neighbors(adj_list)
     components = find_connected_components(adj_list)
+    xor_cut = detect_xor_cut(adj_list)
+    sequence_cut = detect_sequence_cut(adj_list)
     
     return {
         'start_activities': start_set,
@@ -153,12 +155,17 @@ def discover_inductive_model(event_log: pd.DataFrame) -> Dict[str, Any]:
         'relations': relations,
         'adjacency_list': adj_list,
         'activity_neighbors': activity_neighbors,
-        'connected_components': components
+        'connected_components': components,
+        'xor_cut': xor_cut,
+        'sequence_cut': sequence_cut
     }
 
 
 def summarize_model(model: Dict[str, Any]) -> Dict[str, Any]:
     """Create summary statistics for discovered model."""
+    xor_cut = model.get('xor_cut')
+    sequence_cut = model.get('sequence_cut')
+    
     return {
         'algorithm': 'Inductive Miner',
         'num_start_activities': len(model['start_activities']),
@@ -167,7 +174,11 @@ def summarize_model(model: Dict[str, Any]) -> Dict[str, Any]:
         'num_activities': len(model['adjacency_list']),
         'num_components': len(model['connected_components']),
         'components': [list(c) for c in model['connected_components']],
-        'implementation_status': 'partial graph-based inductive miner implementation'
+        'implementation_status': 'simplified inductive miner with xor and sequence cut detection',
+        'xor_cut_detected': xor_cut is not None,
+        'sequence_cut_detected': sequence_cut is not None,
+        'num_xor_groups': len(xor_cut) if xor_cut else 0,
+        'num_sequence_groups': len(sequence_cut) if sequence_cut else 0
     }
 
 
