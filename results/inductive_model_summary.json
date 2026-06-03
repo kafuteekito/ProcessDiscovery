@@ -1,0 +1,36 @@
+{
+  "algorithm": "Inductive Miner",
+  "num_start_activities": 6,
+  "num_end_activities": 14,
+  "num_relations": 116,
+  "num_activities": 16,
+  "num_components": 1,
+  "components": [
+    [
+      "IV Liquid",
+      "Release B",
+      "ER Registration",
+      "Admission IC",
+      "ER Triage",
+      "CRP",
+      "IV Antibiotics",
+      "Leucocytes",
+      "Admission NC",
+      "Release E",
+      "LacticAcid",
+      "Release C",
+      "ER Sepsis Triage",
+      "Release D",
+      "Release A",
+      "Return ER"
+    ]
+  ],
+  "implementation_status": "simplified inductive miner with xor, sequence, parallel and loop candidate detection",
+  "xor_cut_detected": false,
+  "sequence_cut_detected": false,
+  "parallel_cut_detected": true,
+  "loop_candidate_detected": true,
+  "num_xor_groups": 0,
+  "num_sequence_groups": 0,
+  "num_parallel_groups": 46
+}
