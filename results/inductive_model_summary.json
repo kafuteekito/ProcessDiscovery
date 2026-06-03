@@ -1,0 +1,33 @@
+{
+  "algorithm": "Inductive Miner",
+  "num_start_activities": 6,
+  "num_end_activities": 14,
+  "num_relations": 116,
+  "num_activities": 16,
+  "num_components": 1,
+  "components": [
+    [
+      "Leucocytes",
+      "Release E",
+      "LacticAcid",
+      "CRP",
+      "Admission NC",
+      "ER Sepsis Triage",
+      "Return ER",
+      "Release C",
+      "Release B",
+      "Admission IC",
+      "IV Liquid",
+      "Release D",
+      "IV Antibiotics",
+      "Release A",
+      "ER Registration",
+      "ER Triage"
+    ]
+  ],
+  "implementation_status": "simplified inductive miner with xor and sequence cut detection",
+  "xor_cut_detected": false,
+  "sequence_cut_detected": false,
+  "num_xor_groups": 0,
+  "num_sequence_groups": 0
+}
