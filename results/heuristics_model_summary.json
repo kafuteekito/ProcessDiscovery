@@ -1,0 +1,280 @@
+{
+  "number_of_activities": 16,
+  "number_of_selected_edges": 41,
+  "start_activities": [
+    "CRP",
+    "ER Registration",
+    "ER Sepsis Triage",
+    "ER Triage",
+    "IV Liquid",
+    "Leucocytes"
+  ],
+  "end_activities": [
+    "Admission NC",
+    "CRP",
+    "ER Sepsis Triage",
+    "ER Triage",
+    "IV Antibiotics",
+    "IV Liquid",
+    "LacticAcid",
+    "Leucocytes",
+    "Release A",
+    "Release B",
+    "Release C",
+    "Release D",
+    "Release E",
+    "Return ER"
+  ],
+  "selected_edges": [
+    {
+      "source": "ER Triage",
+      "target": "ER Sepsis Triage",
+      "frequency": 905,
+      "dependency": 0.9879253567508233
+    },
+    {
+      "source": "ER Sepsis Triage",
+      "target": "IV Liquid",
+      "frequency": 285,
+      "dependency": 0.9488054607508533
+    },
+    {
+      "source": "IV Liquid",
+      "target": "IV Antibiotics",
+      "frequency": 501,
+      "dependency": 0.7783687943262412
+    },
+    {
+      "source": "IV Antibiotics",
+      "target": "Admission NC",
+      "frequency": 489,
+      "dependency": 0.9898373983739838
+    },
+    {
+      "source": "Leucocytes",
+      "target": "Release A",
+      "frequency": 225,
+      "dependency": 0.986784140969163
+    },
+    {
+      "source": "ER Registration",
+      "target": "ER Triage",
+      "frequency": 971,
+      "dependency": 0.9887410440122825
+    },
+    {
+      "source": "CRP",
+      "target": "Release A",
+      "frequency": 322,
+      "dependency": 0.9907407407407407
+    },
+    {
+      "source": "ER Sepsis Triage",
+      "target": "Leucocytes",
+      "frequency": 269,
+      "dependency": 0.761437908496732
+    },
+    {
+      "source": "ER Sepsis Triage",
+      "target": "CRP",
+      "frequency": 192,
+      "dependency": 0.6885964912280702
+    },
+    {
+      "source": "Release A",
+      "target": "Return ER",
+      "frequency": 276,
+      "dependency": 0.9963898916967509
+    },
+    {
+      "source": "LacticAcid",
+      "target": "IV Antibiotics",
+      "frequency": 89,
+      "dependency": 0.5169491525423728
+    },
+    {
+      "source": "Admission NC",
+      "target": "Release A",
+      "frequency": 117,
+      "dependency": 0.9915254237288136
+    },
+    {
+      "source": "Admission NC",
+      "target": "Release B",
+      "frequency": 17,
+      "dependency": 0.8421052631578947
+    },
+    {
+      "source": "ER Sepsis Triage",
+      "target": "IV Antibiotics",
+      "frequency": 76,
+      "dependency": 0.987012987012987
+    },
+    {
+      "source": "LacticAcid",
+      "target": "Admission NC",
+      "frequency": 102,
+      "dependency": 0.5769230769230769
+    },
+    {
+      "source": "LacticAcid",
+      "target": "IV Liquid",
+      "frequency": 124,
+      "dependency": 0.546583850931677
+    },
+    {
+      "source": "ER Sepsis Triage",
+      "target": "LacticAcid",
+      "frequency": 148,
+      "dependency": 0.5549738219895288
+    },
+    {
+      "source": "Admission NC",
+      "target": "Admission IC",
+      "frequency": 20,
+      "dependency": 0.64
+    },
+    {
+      "source": "Admission IC",
+      "target": "LacticAcid",
+      "frequency": 41,
+      "dependency": 0.5961538461538461
+    },
+    {
+      "source": "CRP",
+      "target": "Release B",
+      "frequency": 19,
+      "dependency": 0.95
+    },
+    {
+      "source": "IV Antibiotics",
+      "target": "Admission IC",
+      "frequency": 46,
+      "dependency": 0.9787234042553191
+    },
+    {
+      "source": "ER Triage",
+      "target": "Leucocytes",
+      "frequency": 52,
+      "dependency": 0.640625
+    },
+    {
+      "source": "CRP",
+      "target": "Release C",
+      "frequency": 13,
+      "dependency": 0.9285714285714286
+    },
+    {
+      "source": "ER Sepsis Triage",
+      "target": "Admission NC",
+      "frequency": 19,
+      "dependency": 0.56
+    },
+    {
+      "source": "IV Antibiotics",
+      "target": "ER Triage",
+      "frequency": 6,
+      "dependency": 0.625
+    },
+    {
+      "source": "Leucocytes",
+      "target": "Release C",
+      "frequency": 8,
+      "dependency": 0.8888888888888888
+    },
+    {
+      "source": "Leucocytes",
+      "target": "Release D",
+      "frequency": 11,
+      "dependency": 0.9166666666666666
+    },
+    {
+      "source": "LacticAcid",
+      "target": "Release A",
+      "frequency": 3,
+      "dependency": 0.75
+    },
+    {
+      "source": "LacticAcid",
+      "target": "Release B",
+      "frequency": 4,
+      "dependency": 0.8
+    },
+    {
+      "source": "Release D",
+      "target": "Return ER",
+      "frequency": 10,
+      "dependency": 0.9090909090909091
+    },
+    {
+      "source": "ER Registration",
+      "target": "LacticAcid",
+      "frequency": 10,
+      "dependency": 0.75
+    },
+    {
+      "source": "Leucocytes",
+      "target": "Release B",
+      "frequency": 14,
+      "dependency": 0.9333333333333333
+    },
+    {
+      "source": "CRP",
+      "target": "Release D",
+      "frequency": 12,
+      "dependency": 0.9230769230769231
+    },
+    {
+      "source": "IV Liquid",
+      "target": "Release A",
+      "frequency": 2,
+      "dependency": 0.6666666666666666
+    },
+    {
+      "source": "CRP",
+      "target": "Release E",
+      "frequency": 3,
+      "dependency": 0.75
+    },
+    {
+      "source": "Admission NC",
+      "target": "Release C",
+      "frequency": 4,
+      "dependency": 0.8
+    },
+    {
+      "source": "IV Liquid",
+      "target": "Admission IC",
+      "frequency": 3,
+      "dependency": 0.75
+    },
+    {
+      "source": "Release C",
+      "target": "Return ER",
+      "frequency": 6,
+      "dependency": 0.8571428571428571
+    },
+    {
+      "source": "Leucocytes",
+      "target": "Release E",
+      "frequency": 2,
+      "dependency": 0.6666666666666666
+    },
+    {
+      "source": "IV Antibiotics",
+      "target": "Release A",
+      "frequency": 2,
+      "dependency": 0.6666666666666666
+    },
+    {
+      "source": "Return ER",
+      "target": "CRP",
+      "frequency": 3,
+      "dependency": 0.75
+    }
+  ],
+  "thresholds_used": {
+    "dependency_threshold": 0.5,
+    "frequency_threshold": 2
+  }
+}
