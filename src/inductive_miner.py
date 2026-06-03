@@ -139,6 +139,54 @@ def detect_sequence_cut(adjacency_list: Dict[str, Set[str]]) -> list[Set[str]] |
     return ordered if len(ordered) > 1 else None
 
 
+def detect_parallel_cut(adjacency_list: Dict[str, Set[str]]) -> list[Set[str]] | None:
+    """Detect parallel cut by finding bidirectional relationships between activities."""
+    bidirectional_pairs: list[Set[str]] = []
+    
+    for source, targets in adjacency_list.items():
+        for target in targets:
+            # Check if reverse relationship exists (target -> source)
+            if source in adjacency_list.get(target, set()):
+                pair = frozenset([source, target])
+                if pair not in [frozenset(p) for p in bidirectional_pairs]:
+                    bidirectional_pairs.append({source, target})
+    
+    return bidirectional_pairs if bidirectional_pairs else None
+
+
+def detect_loop_candidate(adjacency_list: Dict[str, Set[str]]) -> bool | None:
+    """Detect loop candidate by checking for self-loops or cycles."""
+    # Check for self-loops first
+    for source, targets in adjacency_list.items():
+        if source in targets:
+            return True
+    
+    # Check for simple cycles using DFS
+    def has_cycle(start: str, visited: Set[str], path: Set[str]) -> bool:
+        if start in path:
+            return True
+        if start in visited:
+            return False
+        
+        visited.add(start)
+        path.add(start)
+        
+        for neighbor in adjacency_list.get(start, set()):
+            if has_cycle(neighbor, visited, path):
+                return True
+        
+        path.remove(start)
+        return False
+    
+    visited: Set[str] = set()
+    for node in adjacency_list.keys():
+        if node not in visited:
+            if has_cycle(node, visited, set()):
+                return True
+    
+    return None
+
+
 def discover_inductive_model(event_log: pd.DataFrame) -> Dict[str, Any]:
     """Discover process model from event log using inductive miner."""
     start_set, end_set = extract_start_end_activities(event_log)
@@ -148,6 +196,8 @@ def discover_inductive_model(event_log: pd.DataFrame) -> Dict[str, Any]:
     components = find_connected_components(adj_list)
     xor_cut = detect_xor_cut(adj_list)
     sequence_cut = detect_sequence_cut(adj_list)
+    parallel_cut = detect_parallel_cut(adj_list)
+    loop_candidate = detect_loop_candidate(adj_list)
     
     return {
         'start_activities': start_set,
@@ -157,7 +207,9 @@ def discover_inductive_model(event_log: pd.DataFrame) -> Dict[str, Any]:
         'activity_neighbors': activity_neighbors,
         'connected_components': components,
         'xor_cut': xor_cut,
-        'sequence_cut': sequence_cut
+        'sequence_cut': sequence_cut,
+        'parallel_cut': parallel_cut,
+        'loop_candidate': loop_candidate
     }
 
 
@@ -165,6 +217,8 @@ def summarize_model(model: Dict[str, Any]) -> Dict[str, Any]:
     """Create summary statistics for discovered model."""
     xor_cut = model.get('xor_cut')
     sequence_cut = model.get('sequence_cut')
+    parallel_cut = model.get('parallel_cut')
+    loop_candidate = model.get('loop_candidate')
     
     return {
         'algorithm': 'Inductive Miner',
@@ -174,11 +228,14 @@ def summarize_model(model: Dict[str, Any]) -> Dict[str, Any]:
         'num_activities': len(model['adjacency_list']),
         'num_components': len(model['connected_components']),
         'components': [list(c) for c in model['connected_components']],
-        'implementation_status': 'simplified inductive miner with xor and sequence cut detection',
+        'implementation_status': 'simplified inductive miner with xor, sequence, parallel and loop candidate detection',
         'xor_cut_detected': xor_cut is not None,
         'sequence_cut_detected': sequence_cut is not None,
+        'parallel_cut_detected': parallel_cut is not None,
+        'loop_candidate_detected': loop_candidate is True,
         'num_xor_groups': len(xor_cut) if xor_cut else 0,
-        'num_sequence_groups': len(sequence_cut) if sequence_cut else 0
+        'num_sequence_groups': len(sequence_cut) if sequence_cut else 0,
+        'num_parallel_groups': len(parallel_cut) if parallel_cut else 0
     }
 
 

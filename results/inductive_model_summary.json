@@ -7,27 +7,30 @@
   "num_components": 1,
   "components": [
     [
+      "IV Liquid",
+      "Release B",
+      "ER Registration",
+      "Admission IC",
+      "ER Triage",
+      "CRP",
+      "IV Antibiotics",
       "Leucocytes",
+      "Admission NC",
       "Release E",
       "LacticAcid",
-      "CRP",
-      "Admission NC",
-      "ER Sepsis Triage",
-      "Return ER",
       "Release C",
-      "Release B",
-      "Admission IC",
-      "IV Liquid",
+      "ER Sepsis Triage",
       "Release D",
-      "IV Antibiotics",
       "Release A",
-      "ER Registration",
-      "ER Triage"
+      "Return ER"
     ]
   ],
-  "implementation_status": "simplified inductive miner with xor and sequence cut detection",
+  "implementation_status": "simplified inductive miner with xor, sequence, parallel and loop candidate detection",
   "xor_cut_detected": false,
   "sequence_cut_detected": false,
+  "parallel_cut_detected": true,
+  "loop_candidate_detected": true,
   "num_xor_groups": 0,
-  "num_sequence_groups": 0
+  "num_sequence_groups": 0,
+  "num_parallel_groups": 46
 }
