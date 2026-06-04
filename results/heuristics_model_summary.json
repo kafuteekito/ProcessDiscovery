@@ -1,0 +1,456 @@
+{
+  "metadata": {
+    "total_activities": 16,
+    "total_edges": 19,
+    "total_self_loops": 4,
+    "thresholds": {
+      "dependency_threshold": 0.5,
+      "frequency_threshold": 2,
+      "all_dependencies_threshold": 0.05,
+      "and_threshold": 0.7,
+      "xor_threshold": 0.3
+    }
+  },
+  "activities": [
+    "Admission IC",
+    "Admission NC",
+    "CRP",
+    "ER Registration",
+    "ER Sepsis Triage",
+    "ER Triage",
+    "IV Antibiotics",
+    "IV Liquid",
+    "LacticAcid",
+    "Leucocytes",
+    "Release A",
+    "Release B",
+    "Release C",
+    "Release D",
+    "Release E",
+    "Return ER"
+  ],
+  "start_activities": {
+    "ER Registration": 995,
+    "ER Sepsis Triage": 7,
+    "CRP": 10,
+    "Leucocytes": 18,
+    "IV Liquid": 14,
+    "ER Triage": 6
+  },
+  "end_activities": {
+    "Release A": 393,
+    "IV Antibiotics": 87,
+    "Return ER": 291,
+    "LacticAcid": 24,
+    "Admission NC": 14,
+    "CRP": 41,
+    "ER Sepsis Triage": 49,
+    "Leucocytes": 44,
+    "IV Liquid": 12,
+    "Release B": 55,
+    "Release E": 5,
+    "Release C": 19,
+    "Release D": 14,
+    "ER Triage": 2
+  },
+  "edges": [
+    {
+      "from": "ER Triage",
+      "to": "ER Sepsis Triage",
+      "dependency": 0.988
+    },
+    {
+      "from": "ER Sepsis Triage",
+      "to": "IV Liquid",
+      "dependency": 0.949
+    },
+    {
+      "from": "IV Liquid",
+      "to": "IV Antibiotics",
+      "dependency": 0.778
+    },
+    {
+      "from": "IV Antibiotics",
+      "to": "Admission NC",
+      "dependency": 0.99
+    },
+    {
+      "from": "CRP",
+      "to": "Release A",
+      "dependency": 0.991
+    },
+    {
+      "from": "ER Registration",
+      "to": "ER Triage",
+      "dependency": 0.989
+    },
+    {
+      "from": "Admission NC",
+      "to": "Release A",
+      "dependency": 0.992
+    },
+    {
+      "from": "Release A",
+      "to": "Return ER",
+      "dependency": 0.996
+    },
+    {
+      "from": "Leucocytes",
+      "to": "Release A",
+      "dependency": 0.986
+    },
+    {
+      "from": "CRP",
+      "to": "Release B",
+      "dependency": 0.952
+    },
+    {
+      "from": "ER Sepsis Triage",
+      "to": "IV Antibiotics",
+      "dependency": 0.987
+    },
+    {
+      "from": "Admission IC",
+      "to": "LacticAcid",
+      "dependency": 0.672
+    },
+    {
+      "from": "IV Antibiotics",
+      "to": "Admission IC",
+      "dependency": 0.979
+    },
+    {
+      "from": "Release D",
+      "to": "Return ER",
+      "dependency": 0.909
+    },
+    {
+      "from": "LacticAcid",
+      "to": "Release A",
+      "dependency": 0.8
+    },
+    {
+      "from": "Release C",
+      "to": "Return ER",
+      "dependency": 0.857
+    },
+    {
+      "from": "IV Liquid",
+      "to": "Admission IC",
+      "dependency": 0.75
+    },
+    {
+      "from": "LacticAcid",
+      "to": "Release B",
+      "dependency": 0.8
+    },
+    {
+      "from": "CRP",
+      "to": "Release E",
+      "dependency": 0.75
+    }
+  ],
+  "self_loops": [
+    {
+      "activity": "CRP",
+      "dependency": 0.997
+    },
+    {
+      "activity": "Leucocytes",
+      "dependency": 0.998
+    },
+    {
+      "activity": "Admission NC",
+      "dependency": 0.994
+    },
+    {
+      "activity": "LacticAcid",
+      "dependency": 0.988
+    }
+  ],
+  "outgoing": {
+    "ER Triage": [
+      {
+        "to": "ER Sepsis Triage",
+        "dependency": 0.9879253567508233
+      }
+    ],
+    "ER Sepsis Triage": [
+      {
+        "to": "IV Liquid",
+        "dependency": 0.9488054607508533
+      },
+      {
+        "to": "IV Antibiotics",
+        "dependency": 0.987012987012987
+      }
+    ],
+    "IV Liquid": [
+      {
+        "to": "IV Antibiotics",
+        "dependency": 0.7783687943262412
+      },
+      {
+        "to": "Admission IC",
+        "dependency": 0.75
+      }
+    ],
+    "IV Antibiotics": [
+      {
+        "to": "Admission NC",
+        "dependency": 0.9898373983739838
+      },
+      {
+        "to": "Admission IC",
+        "dependency": 0.9787234042553191
+      }
+    ],
+    "CRP": [
+      {
+        "to": "Release A",
+        "dependency": 0.9908814589665653
+      },
+      {
+        "to": "Release B",
+        "dependency": 0.9523809523809523
+      },
+      {
+        "to": "Release E",
+        "dependency": 0.75
+      }
+    ],
+    "ER Registration": [
+      {
+        "to": "ER Triage",
+        "dependency": 0.9887410440122825
+      }
+    ],
+    "Admission NC": [
+      {
+        "to": "Release A",
+        "dependency": 0.9915254237288136
+      }
+    ],
+    "Release A": [
+      {
+        "to": "Return ER",
+        "dependency": 0.9963898916967509
+      }
+    ],
+    "Leucocytes": [
+      {
+        "to": "Release A",
+        "dependency": 0.9864253393665159
+      }
+    ],
+    "Admission IC": [
+      {
+        "to": "LacticAcid",
+        "dependency": 0.6724137931034483
+      }
+    ],
+    "Release D": [
+      {
+        "to": "Return ER",
+        "dependency": 0.9090909090909091
+      }
+    ],
+    "LacticAcid": [
+      {
+        "to": "Release A",
+        "dependency": 0.8
+      },
+      {
+        "to": "Release B",
+        "dependency": 0.8
+      }
+    ],
+    "Release C": [
+      {
+        "to": "Return ER",
+        "dependency": 0.8571428571428571
+      }
+    ]
+  },
+  "incoming": {
+    "ER Sepsis Triage": [
+      {
+        "from": "ER Triage",
+        "dependency": 0.9879253567508233
+      }
+    ],
+    "IV Liquid": [
+      {
+        "from": "ER Sepsis Triage",
+        "dependency": 0.9488054607508533
+      }
+    ],
+    "IV Antibiotics": [
+      {
+        "from": "IV Liquid",
+        "dependency": 0.7783687943262412
+      },
+      {
+        "from": "ER Sepsis Triage",
+        "dependency": 0.987012987012987
+      }
+    ],
+    "Admission NC": [
+      {
+        "from": "IV Antibiotics",
+        "dependency": 0.9898373983739838
+      }
+    ],
+    "Release A": [
+      {
+        "from": "CRP",
+        "dependency": 0.9908814589665653
+      },
+      {
+        "from": "Admission NC",
+        "dependency": 0.9915254237288136
+      },
+      {
+        "from": "Leucocytes",
+        "dependency": 0.9864253393665159
+      },
+      {
+        "from": "LacticAcid",
+        "dependency": 0.8
+      }
+    ],
+    "ER Triage": [
+      {
+        "from": "ER Registration",
+        "dependency": 0.9887410440122825
+      }
+    ],
+    "Return ER": [
+      {
+        "from": "Release A",
+        "dependency": 0.9963898916967509
+      },
+      {
+        "from": "Release D",
+        "dependency": 0.9090909090909091
+      },
+      {
+        "from": "Release C",
+        "dependency": 0.8571428571428571
+      }
+    ],
+    "Release B": [
+      {
+        "from": "CRP",
+        "dependency": 0.9523809523809523
+      },
+      {
+        "from": "LacticAcid",
+        "dependency": 0.8
+      }
+    ],
+    "LacticAcid": [
+      {
+        "from": "Admission IC",
+        "dependency": 0.6724137931034483
+      }
+    ],
+    "Admission IC": [
+      {
+        "from": "IV Antibiotics",
+        "dependency": 0.9787234042553191
+      },
+      {
+        "from": "IV Liquid",
+        "dependency": 0.75
+      }
+    ],
+    "Release E": [
+      {
+        "from": "CRP",
+        "dependency": 0.75
+      }
+    ]
+  },
+  "gateways": [
+    "ER Sepsis Triage",
+    "IV Liquid",
+    "IV Antibiotics",
+    "CRP",
+    "LacticAcid"
+  ],
+  "splits": {
+    "ER Sepsis Triage": [
+      {
+        "successors": [
+          "IV Liquid",
+          "IV Antibiotics"
+        ],
+        "type": "AND",
+        "probability": 0.853
+      }
+    ],
+    "IV Liquid": [
+      {
+        "successors": [
+          "IV Antibiotics",
+          "Admission IC"
+        ],
+        "type": "XOR",
+        "probability": 0.124
+      }
+    ],
+    "IV Antibiotics": [
+      {
+        "successors": [
+          "Admission NC",
+          "Admission IC"
+        ],
+        "type": "XOR",
+        "probability": 0.129
+      }
+    ],
+    "CRP": [
+      {
+        "successors": [
+          "Release A",
+          "Release B"
+        ],
+        "type": "XOR",
+        "probability": 0.0
+      },
+      {
+        "successors": [
+          "Release A",
+          "Release E"
+        ],
+        "type": "XOR",
+        "probability": 0.0
+      },
+      {
+        "successors": [
+          "Release B",
+          "Release E"
+        ],
+        "type": "XOR",
+        "probability": 0.0
+      }
+    ],
+    "LacticAcid": [
+      {
+        "successors": [
+          "Release A",
+          "Release B"
+        ],
+        "type": "XOR",
+        "probability": 0.0
+      }
+    ]
+  },
+  "split_summary": {
+    "AND": 1,
+    "XOR": 6,
+    "OR": 0,
+    "activities_with_splits": 5
+  }
+}
