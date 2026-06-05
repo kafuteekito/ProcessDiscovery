@@ -1,5 +1,6 @@
 import pm4py
 import pandas as pd
+from src.heuristics_miner import discover_heuristics_net, save_model_summary
 
 
 def load_event_log(file_path):
@@ -58,3 +59,20 @@ if __name__ == "__main__":
 
     print("\n" + "=" * 60)
     print("✅ Event log loaded and inspected successfully!")
+
+    print("\n" + "=" * 60)
+    print("Running Heuristics Miner...")
+
+    heuristics_result = discover_heuristics_net(
+        df,
+        dependency_threshold=0.5,
+        frequency_threshold=2
+    )
+
+    save_model_summary(
+        heuristics_result,
+        "results/heuristics_net_summary.json"
+    )
+
+    print("✅ Heuristics Miner finished!")
+    print("Summary saved to: results/heuristics_net_summary.json")
