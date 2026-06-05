@@ -279,45 +279,45 @@ def _build_process_tree_from_model(model: Dict[str, Any]) -> ProcessTree:
         for group in model["sequence_cut"]:
             if len(group) == 1:
                 activity = list(group)[0]
-                child = ProcessTree(Operator.LEAF, name=activity)
+                child = ProcessTree(label=activity)
             else:
-                child = ProcessTree(Operator.PARALLEL)
+                child = ProcessTree(operator=Operator.PARALLEL)
                 for act in group:
-                    child.children.append(ProcessTree(Operator.LEAF, name=act))
+                    child.children.append(ProcessTree(label=act))
             children.append(child)
         
-        root = ProcessTree(Operator.SEQUENCE)
+        root = ProcessTree(operator=Operator.SEQUENCE)
         root.children = children
         return root
     
     elif model["xor_cut"]:
-        root = ProcessTree(Operator.XOR)
+        root = ProcessTree(operator=Operator.XOR)
         for group in model["xor_cut"]:
             if len(group) == 1:
                 activity = list(group)[0]
-                child = ProcessTree(Operator.LEAF, name=activity)
+                child = ProcessTree(label=activity)
             else:
-                child = ProcessTree(Operator.SEQUENCE)
+                child = ProcessTree(operator=Operator.SEQUENCE)
                 for act in group:
-                    child.children.append(ProcessTree(Operator.LEAF, name=act))
+                    child.children.append(ProcessTree(label=act))
             root.children.append(child)
         return root
     
     elif model["parallel_cut"]:
-        root = ProcessTree(Operator.PARALLEL)
+        root = ProcessTree(operator=Operator.PARALLEL)
         for pair in model["parallel_cut"]:
             for act in pair:
-                root.children.append(ProcessTree(Operator.LEAF, name=act))
+                root.children.append(ProcessTree(label=act))
         return root
     
     else:
         activities = list(model["start_activities"])
         if len(activities) == 1:
-            return ProcessTree(Operator.LEAF, name=activities[0])
+            return ProcessTree(label=activities[0])
         else:
-            root = ProcessTree(Operator.XOR)
+            root = ProcessTree(operator=Operator.XOR)
             for act in activities:
-                root.children.append(ProcessTree(Operator.LEAF, name=act))
+                root.children.append(ProcessTree(label=act))
             return root
 
 
