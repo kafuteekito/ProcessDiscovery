@@ -271,10 +271,6 @@ def make_flower_node(*children: Dict[str, Any]) -> Dict[str, Any]:
     """Create a flower (loop) operator node."""
     return {'type': 'flower', 'children': list(children)}
 
-import pm4py
-from pm4py.objects.process_tree.obj import ProcessTree, Operator
-from typing import Dict, Any, List, Set, Tuple
-
 
 def _build_process_tree_from_model(model: Dict[str, Any]) -> ProcessTree:
     """Build PM4Py ProcessTree from discovered model."""
