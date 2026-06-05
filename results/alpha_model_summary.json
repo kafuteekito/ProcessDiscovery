@@ -1,0 +1,33 @@
+{
+  "num_places": 6,
+  "num_transitions": 16,
+  "num_arcs": 34,
+  "transition_labels": [
+    "Admission IC",
+    "Admission NC",
+    "CRP",
+    "ER Registration",
+    "ER Sepsis Triage",
+    "ER Triage",
+    "IV Antibiotics",
+    "IV Liquid",
+    "LacticAcid",
+    "Leucocytes",
+    "Release A",
+    "Release B",
+    "Release C",
+    "Release D",
+    "Release E",
+    "Return ER"
+  ],
+  "place_names": [
+    "i_L",
+    "o_L",
+    "p_(ER Sepsis Triage,IV Antibiotics)",
+    "p_(IV Antibiotics,ER Registration,Release A,Release B)",
+    "p_(IV Liquid,Release A,Release B)",
+    "p_(Release A,Release C,Release D,Release E,Return ER)"
+  ],
+  "source_place": "i_L",
+  "sink_place": "o_L"
+}

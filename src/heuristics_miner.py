@@ -642,6 +642,7 @@ def run_tests():
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     run_tests()
 
 # =============================================================================
@@ -764,3 +765,6 @@ def discover_heuristics_net(df, dependency_threshold=0.5, frequency_threshold=2)
     
     return net, im, fm
 
+=======
+    run_tests()
+>>>>>>> 9889dcf36890776ab87b2f66c788098027e7cf9c

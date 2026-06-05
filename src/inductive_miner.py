@@ -1,7 +1,8 @@
-from typing import Any, Dict, Set, Tuple
+from typing import Any, Dict, Set, Tuple, List
+from pm4py.objects.process_tree.obj import ProcessTree, Operator
 import json
 import pandas as pd
-
+import pm4py
 
 def extract_start_end_activities(event_log: pd.DataFrame) -> Tuple[Set[str], Set[str]]:
     """Extract start and end activities for each case from an event log."""
@@ -269,6 +270,65 @@ def make_parallel_node(*children: Dict[str, Any]) -> Dict[str, Any]:
 def make_flower_node(*children: Dict[str, Any]) -> Dict[str, Any]:
     """Create a flower (loop) operator node."""
     return {'type': 'flower', 'children': list(children)}
+
+
+def _build_process_tree_from_model(model: Dict[str, Any]) -> ProcessTree:
+    """Build PM4Py ProcessTree from discovered model."""
+    if model["sequence_cut"]:
+        children = []
+        for group in model["sequence_cut"]:
+            if len(group) == 1:
+                activity = list(group)[0]
+                child = ProcessTree(label=activity)
+            else:
+                child = ProcessTree(operator=Operator.PARALLEL)
+                for act in group:
+                    child.children.append(ProcessTree(label=act))
+            children.append(child)
+        
+        root = ProcessTree(operator=Operator.SEQUENCE)
+        root.children = children
+        return root
+    
+    elif model["xor_cut"]:
+        root = ProcessTree(operator=Operator.XOR)
+        for group in model["xor_cut"]:
+            if len(group) == 1:
+                activity = list(group)[0]
+                child = ProcessTree(label=activity)
+            else:
+                child = ProcessTree(operator=Operator.SEQUENCE)
+                for act in group:
+                    child.children.append(ProcessTree(label=act))
+            root.children.append(child)
+        return root
+    
+    elif model["parallel_cut"]:
+        root = ProcessTree(operator=Operator.PARALLEL)
+        for pair in model["parallel_cut"]:
+            for act in pair:
+                root.children.append(ProcessTree(label=act))
+        return root
+    
+    else:
+        activities = list(model["start_activities"])
+        if len(activities) == 1:
+            return ProcessTree(label=activities[0])
+        else:
+            root = ProcessTree(operator=Operator.XOR)
+            for act in activities:
+                root.children.append(ProcessTree(label=act))
+            return root
+
+
+def discover_inductive_net(event_log: pd.DataFrame) -> Tuple[Any, Any, Any]:
+    """Discover inductive miner net from event log."""
+    log = pm4py.convert_to_event_log(event_log)
+    model = discover_inductive_model(event_log)
+    process_tree = _build_process_tree_from_model(model)
+    petri_net, initial_marking, final_marking = pm4py.convert_to_petri_net(process_tree)
+    
+    return petri_net, initial_marking, final_marking
 
 
 if __name__ == "__main__":
