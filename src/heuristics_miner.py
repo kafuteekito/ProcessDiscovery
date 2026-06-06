@@ -1,6 +1,7 @@
 import pandas as pd
 from collections import Counter
 from itertools import combinations
+from pm4py.objects.petri_net.obj import PetriNet
 
 def extract_traces(df):
     required_cols = ['case:concept:name', 'concept:name', 'time:timestamp']
@@ -214,6 +215,115 @@ def detect_split_types(edges, traces, and_threshold=0.7, xor_threshold=0.3):
     
     return result
 
+def create_transitions(activities, net):
+    """Create one PetriNet.Transition per activity and add to net."""
+    transitions = {}
+    
+    for activity in activities:
+        trans = PetriNet.Transition(activity, activity)
+        net.transitions.add(trans)
+        transitions[activity] = trans
+    
+    return transitions
+
+def create_edge_places(edges, transitions, net):
+    """Create places and arcs for each edge in the dependency graph."""
+    places = {}
+    
+    for a, b, _ in edges:
+        place = PetriNet.Place(f"{a}_{b}")
+        net.places.add(place)
+        
+        net.arcs.add(PetriNet.Arc(transitions[a], place))
+        net.arcs.add(PetriNet.Arc(place, transitions[b]))
+        
+        places[(a, b)] = place
+    
+    return places
+
+def add_source_place(net, transitions, start_activities):
+    """Create source place with initial marking connected to start transitions."""
+    source = PetriNet.Place("source")
+    net.places.add(source)
+    
+    initial_marking = {source: 1}
+    
+    for activity in start_activities:
+        if activity in transitions:
+            net.arcs.add(PetriNet.Arc(source, transitions[activity]))
+    
+    return source, initial_marking
+
+def add_sink_place(net, transitions, end_activities):
+    """Create sink place with final marking connected from end transitions."""
+    sink = PetriNet.Place("sink")
+    net.places.add(sink)
+    
+    final_marking = {sink: 1}
+    
+    for activity in end_activities:
+        if activity in transitions:
+            net.arcs.add(PetriNet.Arc(transitions[activity], sink))
+    
+    return sink, final_marking
+
+def create_transitions(activities, net):
+    transitions = {}
+    for activity in activities:
+        trans = PetriNet.Transition(activity, activity)
+        net.transitions.add(trans)
+        transitions[activity] = trans
+    return transitions
+
+
+def create_edge_places(edges, transitions, net):
+    places = {}
+    for a, b, _ in edges:
+        place = PetriNet.Place(f"{a}_{b}")
+        net.places.add(place)
+        net.arcs.add(PetriNet.Arc(transitions[a], place))
+        net.arcs.add(PetriNet.Arc(place, transitions[b]))
+        places[(a, b)] = place
+    return places
+
+
+def add_source_place(net, transitions, start_activities):
+    source = PetriNet.Place("source")
+    net.places.add(source)
+    initial_marking = {source: 1}
+    for activity in start_activities:
+        if activity in transitions:
+            net.arcs.add(PetriNet.Arc(source, transitions[activity]))
+    return source, initial_marking
+
+
+def add_sink_place(net, transitions, end_activities):
+    sink = PetriNet.Place("sink")
+    net.places.add(sink)
+    final_marking = {sink: 1}
+    for activity in end_activities:
+        if activity in transitions:
+            net.arcs.add(PetriNet.Arc(transitions[activity], sink))
+    return sink, final_marking
+
+
+def build_petri_net(edges, start_activities, end_activities):
+    """Build a complete PetriNet from dependency edges."""
+    net = PetriNet()
+    
+    activities = set()
+    for a, b, _ in edges:
+        activities.add(a)
+        activities.add(b)
+    activities = list(activities)
+    
+    transitions = create_transitions(activities, net)
+    create_edge_places(edges, transitions, net)
+    _, initial_marking = add_source_place(net, transitions, start_activities)
+    _, final_marking = add_sink_place(net, transitions, end_activities)
+    
+    return net, initial_marking, final_marking
+
 
 
 
@@ -425,5 +535,75 @@ if __name__ == "__main__":
     assert 'P' in result_and
     assert result_and['P']['type'] == 'AND'
     assert abs(result_and['P']['probability'] - 0.8) < 0.001
+    
+    print("test passed")
+
+    net = PetriNet()
+    activities = ['A', 'B', 'C', 'D']
+    
+    result = create_transitions(activities, net)
+    
+    assert len(result) == 4
+    assert len(net.transitions) == 4
+    
+    for act in activities:
+        assert act in result
+        assert result[act].label == act
+    
+    print("test passed")
+
+    net = PetriNet()
+    activities = ['A', 'B', 'C']
+    transitions = create_transitions(activities, net)
+    
+    edges = [('A', 'B', 0.8), ('A', 'C', 0.7), ('B', 'C', 0.9)]
+    
+    result = create_edge_places(edges, transitions, net)
+    
+    assert len(result) == 3
+    assert len(net.places) == 3
+    assert len(net.arcs) == 6  # 2 arcs per edge
+    
+    assert ('A', 'B') in result
+    assert ('A', 'C') in result
+    assert ('B', 'C') in result
+    
+    print("test passed")
+
+    net = PetriNet()
+    activities = ['A', 'B', 'C']
+    transitions = create_transitions(activities, net)
+    start_activities = ['A', 'B']
+    
+    source, initial_marking = add_source_place(net, transitions, start_activities)
+    
+    assert source in net.places
+    assert initial_marking[source] == 1
+    assert len(net.arcs) == 2  # One arc to each start transition
+    
+    print("test passed")
+
+    net = PetriNet()
+    activities = ['A', 'B', 'C']
+    transitions = create_transitions(activities, net)
+    end_activities = ['B', 'C']
+    
+    sink, final_marking = add_sink_place(net, transitions, end_activities)
+    
+    assert sink in net.places
+    assert final_marking[sink] == 1
+    assert len(net.arcs) == 2  # One arc from each end transition
+    
+    print("test passed")
+
+    edges = [('A', 'B', 0.8), ('A', 'C', 0.7), ('B', 'D', 0.9), ('C', 'D', 0.85)]
+    start_activities = ['A']
+    end_activities = ['D']
+    
+    net, initial_marking, final_marking = build_petri_net(edges, start_activities, end_activities)
+    
+    assert len(net.transitions) == 4  # A, B, C, D
+    assert len(net.places) == 6  # 4 edge places + source + sink
+    assert len(net.arcs) == 10  # 8 edge arcs + 1 from source + 1 to sink
     
     print("test passed")
