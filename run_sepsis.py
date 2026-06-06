@@ -21,8 +21,8 @@ start_activities = get_start_activities(traces)
 end_activities = get_end_activities(traces)
 normal_pairs, self_loops = compute_directly_follows(traces)
 length2_loops = compute_length2_loops(traces)
-edges = filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2, 
-                           relative_to_best=0.05, length2_loops=length2_loops, length2_threshold=0.9)
+edges = filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05)
+net, initial_marking, final_marking = discover_heuristics_net(df, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05)
 
 # Run heuristics miner with same parameters
 net, initial_marking, final_marking = discover_heuristics_net(df, dep_threshold=0.5, freq_threshold=2, 

@@ -247,10 +247,8 @@ def discover_heuristics_net(df, dep_threshold=0.5, freq_threshold=2, relative_to
     end_activities = list(get_end_activities(traces).keys())
     
     normal_pairs, self_loops = compute_directly_follows(traces)
-    length2_loops = compute_length2_loops(traces)
     
-    edges = filter_dependencies(normal_pairs, self_loops, dep_threshold, freq_threshold, 
-                               relative_to_best, length2_loops, length2_threshold)
+    edges = filter_dependencies(normal_pairs, self_loops, dep_threshold, freq_threshold, relative_to_best)
     
     detect_split_types(edges, traces)
     
