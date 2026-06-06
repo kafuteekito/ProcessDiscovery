@@ -1,5 +1,6 @@
 import pandas as pd
 from collections import Counter
+from itertools import combinations
 
 def extract_traces(df):
     required_cols = ['case:concept:name', 'concept:name', 'time:timestamp']
@@ -171,6 +172,49 @@ def compute_and_probability(traces, a, b, c):
     total = both + only_b + only_c
     return both / total if total > 0 else 0.0
 
+def get_split_candidates(edges):
+    """Return dict mapping source activities to their targets, only for sources with 2+ outgoing edges."""
+    from collections import defaultdict
+    
+    outgoing = defaultdict(list)
+    for a, b, _ in edges:
+        if b not in outgoing[a]:
+            outgoing[a].append(b)
+    
+    return {a: targets for a, targets in outgoing.items() if len(targets) >= 2}
+
+def detect_split_types(edges, traces, and_threshold=0.7, xor_threshold=0.3):
+    """Detect split types (AND/XOR/OR) for each gateway activity."""
+    split_candidates = get_split_candidates(edges)
+    result = {}
+    
+    for activity, successors in split_candidates.items():
+        if len(successors) < 2:
+            continue
+        
+        pair_probs = []
+        for b, c in combinations(successors, 2):
+            prob = compute_and_probability(traces, activity, b, c)
+            pair_probs.append(prob)
+        
+        avg_prob = sum(pair_probs) / len(pair_probs) if pair_probs else 0.0
+        
+        if avg_prob >= and_threshold:
+            split_type = 'AND'
+        elif avg_prob <= xor_threshold:
+            split_type = 'XOR'
+        else:
+            split_type = 'OR'
+        
+        result[activity] = {
+            'successors': successors,
+            'type': split_type,
+            'probability': avg_prob
+        }
+    
+    return result
+
+
 
 
 
@@ -306,4 +350,80 @@ if __name__ == "__main__":
     assert abs(prob - 0.25) < 0.001
     
     print("test passed")
+
+    prob_no_a = compute_and_probability(traces, 'X', 'B', 'C')
+    assert prob_no_a == 0.0
     
+    print("test passed")
+
+    edges = [
+        ('A', 'B', 0.8),
+        ('A', 'C', 0.7),
+        ('A', 'D', 0.6),
+        ('B', 'C', 0.9),
+        ('C', 'D', 0.5),
+    ]
+    
+    result = get_split_candidates(edges)
+    
+    # A has 3 outgoing edges (B, C, D), B has 1, C has 1
+    assert result == {'A': ['B', 'C', 'D']}
+    
+    # Test with no split candidates
+    edges_single = [('A', 'B', 0.8), ('B', 'C', 0.9)]
+    assert get_split_candidates(edges_single) == {}
+    
+    print("test passed")
+
+    edges = [
+        ('A', 'B', 0.8), ('A', 'C', 0.7), ('A', 'D', 0.6),
+        ('X', 'Y', 0.9), ('X', 'Z', 0.85),
+    ]
+    
+    # Traces where A always leads to all of B,C,D (AND split)
+    # Traces where X leads to either Y or Z but never both (XOR split)
+    traces = [
+        ['A', 'B', 'C', 'D'],
+        ['A', 'B', 'C', 'D'],
+        ['A', 'B', 'D', 'C'],
+        ['X', 'Y'],
+        ['X', 'Z'],
+        ['X', 'Y'],
+    ]
+    
+    result = detect_split_types(edges, traces, and_threshold=0.7, xor_threshold=0.3)
+    
+    assert 'A' in result
+    assert result['A']['type'] == 'AND'
+    assert result['A']['successors'] == ['B', 'C', 'D']
+    assert abs(result['A']['probability'] - 1.0) < 0.001
+    
+    assert 'X' in result
+    assert result['X']['type'] == 'XOR'
+    assert result['X']['successors'] == ['Y', 'Z']
+    assert abs(result['X']['probability'] - 0.0) < 0.001
+    
+    print("test passed")
+    
+        # Test AND-split where two activities almost always appear together
+    edges_and = [
+        ('P', 'Q', 0.85),
+        ('P', 'R', 0.82),
+    ]
+    
+    # 4 out of 5 traces have both Q and R after P (prob = 0.8)
+    traces_and = [
+        ['P', 'Q', 'R'],
+        ['P', 'Q', 'R'],
+        ['P', 'Q', 'R'],
+        ['P', 'Q', 'R'],
+        ['P', 'Q'],         # Only Q (1 out of 5)
+    ]
+    
+    result_and = detect_split_types(edges_and, traces_and, and_threshold=0.7, xor_threshold=0.3)
+    
+    assert 'P' in result_and
+    assert result_and['P']['type'] == 'AND'
+    assert abs(result_and['P']['probability'] - 0.8) < 0.001
+    
+    print("test passed")
