@@ -1,0 +1,4 @@
+model,fitness,precision,generalization,simplicity
+alpha,0.2659,0.4426,0.9132,0.4783
+heuristics,0.8968,0.7044,0.8415,0.4332
+inductive,1.0,0.2576,0.9025,0.6224
