@@ -131,8 +131,43 @@ def filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_thresh
     
     return filtered
 
+def compute_and_measure(a, b, c, normal_pairs):
+    """Compute AND-split measure using formula: (|b>>c| + |c>>b|) / (|a>>b| + |a>>c| + 1)."""
+    bc = normal_pairs.get((b, c), 0)
+    cb = normal_pairs.get((c, b), 0)
+    ab = normal_pairs.get((a, b), 0)
+    ac = normal_pairs.get((a, c), 0)
+    
+    return (bc + cb) / (ab + ac + 1)
 
-def detect_split_types(edges, traces, and_threshold=0.7, xor_threshold=0.3):
+
+# Test compute_and_measure
+if __name__ == "__main__":
+    from collections import Counter
+    
+    # A→B=5, A→C=4, B→C=3, C→B=2
+    # Formula: (3+2)/(5+4+1) = 5/10 = 0.5
+    normal_pairs = Counter({('A', 'B'): 5, ('A', 'C'): 4, ('B', 'C'): 3, ('C', 'B'): 2})
+    
+    measure = compute_and_measure('A', 'B', 'C', normal_pairs)
+    assert abs(measure - 0.5) < 0.001
+    
+    # High AND measure: B and C often follow each other
+    normal_pairs_and = Counter({('A', 'B'): 5, ('A', 'C'): 5, ('B', 'C'): 8, ('C', 'B'): 7})
+    # (8+7)/(5+5+1) = 15/11 = 1.36 (capped at 1.0 in practice)
+    measure_and = compute_and_measure('A', 'B', 'C', normal_pairs_and)
+    assert abs(measure_and - 15/11) < 0.001
+    
+    # Low AND measure (XOR-like): B and C rarely follow each other
+    normal_pairs_xor = Counter({('A', 'B'): 5, ('A', 'C'): 5, ('B', 'C'): 0, ('C', 'B'): 0})
+    # (0+0)/(5+5+1) = 0/11 = 0
+    measure_xor = compute_and_measure('A', 'B', 'C', normal_pairs_xor)
+    assert abs(measure_xor - 0.0) < 0.001
+    
+    print("test passed")
+
+
+def detect_split_types(edges, traces, normal_pairs, and_threshold=0.7, xor_threshold=0.3):
     from itertools import combinations
     split_candidates = get_split_candidates(edges)
     result = {}
@@ -141,7 +176,7 @@ def detect_split_types(edges, traces, and_threshold=0.7, xor_threshold=0.3):
             continue
         pair_probs = []
         for b, c in combinations(successors, 2):
-            prob = compute_and_probability(traces, activity, b, c)
+            prob = compute_and_measure(activity, b, c, normal_pairs)
             pair_probs.append(prob)
         avg_prob = sum(pair_probs) / len(pair_probs) if pair_probs else 0.0
         if avg_prob >= and_threshold:
@@ -236,7 +271,7 @@ def build_petri_net(edges, start_activities, end_activities):
     return net, initial_marking, final_marking
 
 
-def discover_heuristics_net(df, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05, length2_threshold=0.9):
+def discover_heuristics_net(df, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05):
     traces = extract_traces(df)
     
     if not traces:
@@ -250,7 +285,7 @@ def discover_heuristics_net(df, dep_threshold=0.5, freq_threshold=2, relative_to
     
     edges = filter_dependencies(normal_pairs, self_loops, dep_threshold, freq_threshold, relative_to_best)
     
-    detect_split_types(edges, traces)
+    detect_split_types(edges, traces, normal_pairs)
     
     net, initial_marking, final_marking = build_petri_net(edges, start_activities, end_activities)
     
