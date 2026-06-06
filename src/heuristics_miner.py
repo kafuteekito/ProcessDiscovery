@@ -76,6 +76,103 @@ def get_best_outgoing(activity, normal_pairs, self_loops, activities):
     
     return max_dep
 
+def filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05):
+    """Filter dependency pairs based on frequency, dependency measure, and relative strength."""
+    # Get all unique activities
+    activities = set()
+    for (a, b) in normal_pairs.keys():
+        activities.add(a)
+        activities.add(b)
+    for a in self_loops.keys():
+        activities.add(a)
+    activities = list(activities)
+    
+    # Pre-compute best outgoing for each activity
+    best_outgoing = {}
+    for act in activities:
+        best_outgoing[act] = get_best_outgoing(act, normal_pairs, self_loops, activities)
+    
+    filtered = []
+    
+    # Check normal pairs (a != b)
+    for (a, b), count in normal_pairs.items():
+        if count < freq_threshold:
+            continue
+        dep_value = compute_dependency_measure(a, b, normal_pairs, self_loops)
+        if dep_value >= dep_threshold and dep_value >= best_outgoing[a] - relative_to_best:
+            filtered.append((a, b, dep_value))
+    
+    # Check self-loops (a == b)
+    for a, count in self_loops.items():
+        if count < freq_threshold:
+            continue
+        dep_value = compute_dependency_measure(a, a, normal_pairs, self_loops)
+        if dep_value >= dep_threshold and dep_value >= best_outgoing[a] - relative_to_best:
+            filtered.append((a, a, dep_value))
+    
+    return filtered
+
+def filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05):
+    """Filter dependency pairs based on frequency, dependency measure, and relative strength."""
+    activities = set()
+    for (a, b) in normal_pairs.keys():
+        activities.add(a)
+        activities.add(b)
+    for a in self_loops.keys():
+        activities.add(a)
+    activities = list(activities)
+    
+    best_outgoing = {}
+    for act in activities:
+        best_outgoing[act] = get_best_outgoing(act, normal_pairs, self_loops, activities)
+    
+    filtered = []
+    
+    for (a, b), count in normal_pairs.items():
+        if count < freq_threshold:
+            continue
+        dep_value = compute_dependency_measure(a, b, normal_pairs, self_loops)
+        if dep_value >= dep_threshold and dep_value >= best_outgoing[a] - relative_to_best:
+            filtered.append((a, b, dep_value))
+    
+    for a, count in self_loops.items():
+        if count < freq_threshold:
+            continue
+        dep_value = compute_dependency_measure(a, a, normal_pairs, self_loops)
+        if dep_value >= dep_threshold and dep_value >= best_outgoing[a] - relative_to_best:
+            filtered.append((a, a, dep_value))
+    
+    return filtered
+
+def compute_and_probability(traces, a, b, c):
+    """Compute probability that both b and c appear after last occurrence of a."""
+    both = 0
+    only_b = 0
+    only_c = 0
+    
+    for trace in traces:
+        if a not in trace:
+            continue
+        
+        # Find index of last occurrence of a
+        last_a_idx = len(trace) - 1 - trace[::-1].index(a)
+        after_a = set(trace[last_a_idx + 1:])
+        
+        has_b = b in after_a
+        has_c = c in after_a
+        
+        if has_b and has_c:
+            both += 1
+        elif has_b:
+            only_b += 1
+        elif has_c:
+            only_c += 1
+    
+    total = both + only_b + only_c
+    return both / total if total > 0 else 0.0
+
+
+
 
 if __name__ == "__main__":
     test_data = {
@@ -124,3 +221,89 @@ if __name__ == "__main__":
     assert abs(best_b - 2/3) < 0.001
     
     print("test passed")
+
+    normal_pairs = Counter({('A', 'B'): 5, ('B', 'A'): 2, ('A', 'C'): 3, ('C', 'D'): 1})
+    self_loops = Counter({'A': 1, 'B': 3})
+    
+    # With dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05:
+    # A→B: count=5>=2, dep=0.375<0.5 → excluded
+    # B→A: count=2>=2, dep=-0.375<0.5 → excluded
+    # A→C: count=3>=2, dep=0.75>=0.5, best_from_A=0.75, 0.75>=0.75-0.05 → included
+    # C→D: count=1<2 → excluded
+    # B→B: count=3>=2, dep=0.667>=0.5, best_from_B=0.667, 0.667>=0.667-0.05 → included
+    
+    result = filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05)
+    
+    assert len(result) == 2
+    assert ('A', 'C', 0.75) in result
+    
+    print("test passed")
+
+    normal_pairs = Counter({
+        ('A', 'B'): 10, ('B', 'A'): 2,
+        ('A', 'C'): 3, ('C', 'A'): 1,
+        ('B', 'C'): 8, ('C', 'B'): 1,
+        ('C', 'D'): 1
+    })
+    self_loops = Counter({'A': 5, 'B': 1})
+    
+    result = filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05)
+    
+    assert len(result) == 2
+    
+    found_bc = False
+    found_aa = False
+    for a, b, dep in result:
+        if a == 'B' and b == 'C':
+            found_bc = True
+            assert abs(dep - 0.7) < 0.001
+        elif a == 'A' and b == 'A':
+            found_aa = True
+            assert abs(dep - 5/6) < 0.001
+    
+    assert found_bc and found_aa
+    
+    print("test passed")
+
+    normal_pairs = Counter({
+        ('A', 'B'): 10, ('B', 'A'): 2,
+        ('A', 'C'): 3, ('C', 'A'): 1,
+        ('B', 'C'): 8, ('C', 'B'): 1,
+        ('C', 'D'): 1
+    })
+    self_loops = Counter({'A': 5, 'B': 1})
+    
+    result = filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05)
+    
+    assert len(result) == 2
+    
+    dep_values = {(a, b): dep for a, b, dep in result}
+    
+    assert ('B', 'C') in dep_values
+    assert abs(dep_values[('B', 'C')] - 0.7) < 0.001
+    
+    assert ('A', 'A') in dep_values
+    assert abs(dep_values[('A', 'A')] - 5/6) < 0.001
+    
+    # Test with thresholds so high nothing passes
+    result_empty = filter_dependencies(normal_pairs, self_loops, dep_threshold=0.99, freq_threshold=100, relative_to_best=0.0)
+    assert result_empty == []
+    
+    print("test passed")
+
+    traces = [
+        ['A', 'B', 'C'],      # A then B,C → both
+        ['A', 'B', 'D'],      # A then B only → only_b
+        ['A', 'C', 'D'],      # A then C only → only_c
+        ['A', 'B', 'C', 'A'], # last A has nothing after → excluded from counts
+        ['X', 'A', 'B'],      # A then B only → only_b
+        ['Y', 'Z'],           # no A → ignored
+    ]
+    
+    # After last A: both=1, only_b=2, only_c=1
+    # Result = 1 / (1 + 2 + 1) = 0.25
+    prob = compute_and_probability(traces, 'A', 'B', 'C')
+    assert abs(prob - 0.25) < 0.001
+    
+    print("test passed")
+    
