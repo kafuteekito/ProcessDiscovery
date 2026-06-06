@@ -344,21 +344,28 @@ if __name__ == "__main__":
 
     normal_pairs = Counter({('A', 'B'): 5, ('B', 'A'): 2})
     self_loops = Counter()
-    length2_loops = Counter({('A', 'C'): 4, ('C', 'A'): 3})
+    # A→C: (5+5)/(5+5+1) = 10/11 = 0.909 >= 0.9 (passes length2_threshold)
+    # C→A: same formula, symmetric
+    length2_loops = Counter({('A', 'C'): 5, ('C', 'A'): 5})
     
-    # A→B passes direct dependency filter
-    # A→C fails direct (not in normal_pairs) but passes length-2 (dep=0.875)
+    # A→B fails direct dependency (0.375 < 0.5)
+    # A→C passes length-2 dependency (0.909 >= 0.9)
+    # C→A passes length-2 dependency (0.909 >= 0.9)
     edges = filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2,
-                               relative_to_best=0.05, length2_loops=length2_loops, length2_threshold=0.5)
+                               relative_to_best=0.05, length2_loops=length2_loops, length2_threshold=0.9)
     
     assert len(edges) == 2
-    assert ('A', 'B', 0.375) in edges or any(e[0] == 'A' and e[1] == 'B' for e in edges)
     
     found_ac = False
+    found_ca = False
     for a, b, dep in edges:
         if a == 'A' and b == 'C':
             found_ac = True
-            assert abs(dep - 0.875) < 0.001  # (4+3)/(4+3+1) = 7/8
-    assert found_ac
+            assert abs(dep - 10/11) < 0.001
+        elif a == 'C' and b == 'A':
+            found_ca = True
+            assert abs(dep - 10/11) < 0.001
+    
+    assert found_ac and found_ca
     
     print("test passed")
