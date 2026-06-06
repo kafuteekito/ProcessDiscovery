@@ -1,7 +1,7 @@
 {
-  "places": 22,
+  "places": 94,
   "transitions": 15,
-  "arcs": 59,
+  "arcs": 203,
   "start_activities": [
     "ER Registration",
     "ER Sepsis Triage",
@@ -26,7 +26,7 @@
     "Release D",
     "ER Triage"
   ],
-  "filtered_edges": 20,
+  "filtered_edges": 92,
   "edges": [
     {
       "from": "ER Triage",
@@ -127,6 +127,366 @@
       "from": "LacticAcid",
       "to": "LacticAcid",
       "dependency": 0.9880952380952381
+    },
+    {
+      "from": "ER Registration",
+      "to": "CRP",
+      "dependency": 0.9859154929577465
+    },
+    {
+      "from": "Leucocytes",
+      "to": "LacticAcid",
+      "dependency": 0.9987129987129987
+    },
+    {
+      "from": "CRP",
+      "to": "ER Triage",
+      "dependency": 0.9963898916967509
+    },
+    {
+      "from": "LacticAcid",
+      "to": "ER Sepsis Triage",
+      "dependency": 0.9956896551724138
+    },
+    {
+      "from": "ER Triage",
+      "to": "IV Liquid",
+      "dependency": 0.9955555555555555
+    },
+    {
+      "from": "IV Liquid",
+      "to": "Admission NC",
+      "dependency": 0.9969604863221885
+    },
+    {
+      "from": "IV Antibiotics",
+      "to": "Leucocytes",
+      "dependency": 0.9976133651551312
+    },
+    {
+      "from": "Admission NC",
+      "to": "CRP",
+      "dependency": 0.9985734664764622
+    },
+    {
+      "from": "Leucocytes",
+      "to": "CRP",
+      "dependency": 0.9993865030674847
+    },
+    {
+      "from": "CRP",
+      "to": "Leucocytes",
+      "dependency": 0.9993865030674847
+    },
+    {
+      "from": "ER Registration",
+      "to": "ER Sepsis Triage",
+      "dependency": 0.9988221436984688
+    },
+    {
+      "from": "ER Triage",
+      "to": "Leucocytes",
+      "dependency": 0.9971181556195965
+    },
+    {
+      "from": "ER Sepsis Triage",
+      "to": "LacticAcid",
+      "dependency": 0.9956896551724138
+    },
+    {
+      "from": "LacticAcid",
+      "to": "IV Liquid",
+      "dependency": 0.9951690821256038
+    },
+    {
+      "from": "CRP",
+      "to": "IV Antibiotics",
+      "dependency": 0.9974489795918368
+    },
+    {
+      "from": "ER Sepsis Triage",
+      "to": "Leucocytes",
+      "dependency": 0.9966777408637874
+    },
+    {
+      "from": "IV Liquid",
+      "to": "CRP",
+      "dependency": 0.996309963099631
+    },
+    {
+      "from": "LacticAcid",
+      "to": "Admission NC",
+      "dependency": 0.9945054945054945
+    },
+    {
+      "from": "IV Antibiotics",
+      "to": "Release A",
+      "dependency": 0.9666666666666667
+    },
+    {
+      "from": "Admission NC",
+      "to": "Return ER",
+      "dependency": 0.9772727272727273
+    },
+    {
+      "from": "ER Triage",
+      "to": "CRP",
+      "dependency": 0.9963898916967509
+    },
+    {
+      "from": "Leucocytes",
+      "to": "IV Antibiotics",
+      "dependency": 0.9976133651551312
+    },
+    {
+      "from": "IV Liquid",
+      "to": "Leucocytes",
+      "dependency": 0.9961089494163424
+    },
+    {
+      "from": "LacticAcid",
+      "to": "CRP",
+      "dependency": 0.9985775248933144
+    },
+    {
+      "from": "CRP",
+      "to": "Admission NC",
+      "dependency": 0.9985734664764622
+    },
+    {
+      "from": "IV Antibiotics",
+      "to": "CRP",
+      "dependency": 0.9974489795918368
+    },
+    {
+      "from": "Admission NC",
+      "to": "Leucocytes",
+      "dependency": 0.9985119047619048
+    },
+    {
+      "from": "Leucocytes",
+      "to": "Return ER",
+      "dependency": 0.9902912621359223
+    },
+    {
+      "from": "ER Triage",
+      "to": "LacticAcid",
+      "dependency": 0.9948186528497409
+    },
+    {
+      "from": "ER Sepsis Triage",
+      "to": "CRP",
+      "dependency": 0.9973190348525469
+    },
+    {
+      "from": "LacticAcid",
+      "to": "Leucocytes",
+      "dependency": 0.9987129987129987
+    },
+    {
+      "from": "CRP",
+      "to": "IV Liquid",
+      "dependency": 0.996309963099631
+    },
+    {
+      "from": "CRP",
+      "to": "LacticAcid",
+      "dependency": 0.9985775248933144
+    },
+    {
+      "from": "CRP",
+      "to": "Return ER",
+      "dependency": 0.9933774834437086
+    },
+    {
+      "from": "Release A",
+      "to": "Leucocytes",
+      "dependency": 0.9967105263157895
+    },
+    {
+      "from": "Return ER",
+      "to": "CRP",
+      "dependency": 0.9933774834437086
+    },
+    {
+      "from": "LacticAcid",
+      "to": "IV Antibiotics",
+      "dependency": 0.9963503649635036
+    },
+    {
+      "from": "Leucocytes",
+      "to": "Admission IC",
+      "dependency": 0.9859154929577465
+    },
+    {
+      "from": "ER Registration",
+      "to": "Leucocytes",
+      "dependency": 0.987012987012987
+    },
+    {
+      "from": "Leucocytes",
+      "to": "ER Sepsis Triage",
+      "dependency": 0.9966777408637874
+    },
+    {
+      "from": "ER Sepsis Triage",
+      "to": "ER Triage",
+      "dependency": 0.9333333333333333
+    },
+    {
+      "from": "Leucocytes",
+      "to": "IV Liquid",
+      "dependency": 0.9961089494163424
+    },
+    {
+      "from": "Leucocytes",
+      "to": "Admission NC",
+      "dependency": 0.9985119047619048
+    },
+    {
+      "from": "ER Registration",
+      "to": "LacticAcid",
+      "dependency": 0.975609756097561
+    },
+    {
+      "from": "IV Antibiotics",
+      "to": "LacticAcid",
+      "dependency": 0.9963503649635036
+    },
+    {
+      "from": "ER Sepsis Triage",
+      "to": "Admission NC",
+      "dependency": 0.96875
+    },
+    {
+      "from": "LacticAcid",
+      "to": "Admission IC",
+      "dependency": 0.9772727272727273
+    },
+    {
+      "from": "IV Liquid",
+      "to": "LacticAcid",
+      "dependency": 0.9951690821256038
+    },
+    {
+      "from": "ER Registration",
+      "to": "IV Liquid",
+      "dependency": 0.9285714285714286
+    },
+    {
+      "from": "Leucocytes",
+      "to": "ER Registration",
+      "dependency": 0.987012987012987
+    },
+    {
+      "from": "LacticAcid",
+      "to": "ER Triage",
+      "dependency": 0.9948186528497409
+    },
+    {
+      "from": "ER Triage",
+      "to": "IV Antibiotics",
+      "dependency": 0.9811320754716981
+    },
+    {
+      "from": "Admission NC",
+      "to": "LacticAcid",
+      "dependency": 0.9945054945054945
+    },
+    {
+      "from": "Admission IC",
+      "to": "Leucocytes",
+      "dependency": 0.9859154929577465
+    },
+    {
+      "from": "Leucocytes",
+      "to": "Release B",
+      "dependency": 0.9545454545454546
+    },
+    {
+      "from": "CRP",
+      "to": "ER Sepsis Triage",
+      "dependency": 0.9973190348525469
+    },
+    {
+      "from": "IV Liquid",
+      "to": "ER Triage",
+      "dependency": 0.9955555555555555
+    },
+    {
+      "from": "CRP",
+      "to": "Admission IC",
+      "dependency": 0.984375
+    },
+    {
+      "from": "Admission IC",
+      "to": "CRP",
+      "dependency": 0.984375
+    },
+    {
+      "from": "IV Antibiotics",
+      "to": "IV Liquid",
+      "dependency": 0.95
+    },
+    {
+      "from": "LacticAcid",
+      "to": "Release A",
+      "dependency": 0.9473684210526315
+    },
+    {
+      "from": "CRP",
+      "to": "Release C",
+      "dependency": 0.9090909090909091
+    },
+    {
+      "from": "IV Liquid",
+      "to": "ER Sepsis Triage",
+      "dependency": 0.975609756097561
+    },
+    {
+      "from": "CRP",
+      "to": "Release D",
+      "dependency": 0.9285714285714286
+    },
+    {
+      "from": "Leucocytes",
+      "to": "Release C",
+      "dependency": 0.9285714285714286
+    },
+    {
+      "from": "Leucocytes",
+      "to": "ER Triage",
+      "dependency": 0.9971181556195965
+    },
+    {
+      "from": "Leucocytes",
+      "to": "Release D",
+      "dependency": 0.9090909090909091
+    },
+    {
+      "from": "Admission NC",
+      "to": "IV Antibiotics",
+      "dependency": 0.993421052631579
+    },
+    {
+      "from": "Admission NC",
+      "to": "IV Liquid",
+      "dependency": 0.9969604863221885
+    },
+    {
+      "from": "IV Antibiotics",
+      "to": "ER Triage",
+      "dependency": 0.9811320754716981
+    },
+    {
+      "from": "CRP",
+      "to": "ER Registration",
+      "dependency": 0.9859154929577465
+    },
+    {
+      "from": "LacticAcid",
+      "to": "ER Registration",
+      "dependency": 0.975609756097561
     }
   ]
 }

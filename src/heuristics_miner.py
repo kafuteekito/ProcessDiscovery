@@ -66,14 +66,34 @@ def get_best_outgoing(activity, normal_pairs, self_loops, activities):
         max_dep = max(max_dep, dep)
     return max_dep
 
+def compute_length2_loops(traces):
+    from collections import Counter
+    length2_loops = Counter()
+    for trace in traces:
+        for i in range(len(trace) - 2):
+            a, b = trace[i], trace[i + 2]
+            length2_loops[(a, b)] += 1
+    return length2_loops
 
-def filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05):
+
+def compute_length2_dependency(a, b, normal_pairs, length2_loops):
+    ab = length2_loops.get((a, b), 0)
+    ba = length2_loops.get((b, a), 0)
+    return (ab + ba) / (ab + ba + 1)
+
+
+def filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2, 
+                       relative_to_best=0.05, length2_loops=None, length2_threshold=0.9):
     activities = set()
     for (a, b) in normal_pairs.keys():
         activities.add(a)
         activities.add(b)
     for a in self_loops.keys():
         activities.add(a)
+    if length2_loops:
+        for (a, b) in length2_loops.keys():
+            activities.add(a)
+            activities.add(b)
     activities = list(activities)
     
     best_outgoing = {}
@@ -81,18 +101,34 @@ def filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_thresh
         best_outgoing[act] = get_best_outgoing(act, normal_pairs, self_loops, activities)
     
     filtered = []
+    seen_pairs = set()
+    
     for (a, b), count in normal_pairs.items():
         if count < freq_threshold:
             continue
         dep_value = compute_dependency_measure(a, b, normal_pairs, self_loops)
         if dep_value >= dep_threshold and dep_value >= best_outgoing[a] - relative_to_best:
             filtered.append((a, b, dep_value))
+            seen_pairs.add((a, b))
+    
     for a, count in self_loops.items():
         if count < freq_threshold:
             continue
         dep_value = compute_dependency_measure(a, a, normal_pairs, self_loops)
         if dep_value >= dep_threshold and dep_value >= best_outgoing[a] - relative_to_best:
             filtered.append((a, a, dep_value))
+            seen_pairs.add((a, a))
+    
+    if length2_loops:
+        for (a, b), count in length2_loops.items():
+            if (a, b) in seen_pairs:
+                continue
+            if count < freq_threshold:
+                continue
+            l2_dep = compute_length2_dependency(a, b, normal_pairs, length2_loops)
+            if l2_dep >= length2_threshold:
+                filtered.append((a, b, l2_dep))
+    
     return filtered
 
 
@@ -200,8 +236,7 @@ def build_petri_net(edges, start_activities, end_activities):
     return net, initial_marking, final_marking
 
 
-def discover_heuristics_net(df, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05):
-    """Discover a PetriNet using the heuristics miner algorithm."""
+def discover_heuristics_net(df, dep_threshold=0.5, freq_threshold=2, relative_to_best=0.05, length2_threshold=0.9):
     traces = extract_traces(df)
     
     if not traces:
@@ -212,8 +247,10 @@ def discover_heuristics_net(df, dep_threshold=0.5, freq_threshold=2, relative_to
     end_activities = list(get_end_activities(traces).keys())
     
     normal_pairs, self_loops = compute_directly_follows(traces)
+    length2_loops = compute_length2_loops(traces)
     
-    edges = filter_dependencies(normal_pairs, self_loops, dep_threshold, freq_threshold, relative_to_best)
+    edges = filter_dependencies(normal_pairs, self_loops, dep_threshold, freq_threshold, 
+                               relative_to_best, length2_loops, length2_threshold)
     
     detect_split_types(edges, traces)
     
@@ -221,9 +258,36 @@ def discover_heuristics_net(df, dep_threshold=0.5, freq_threshold=2, relative_to
     
     return net, initial_marking, final_marking
 
+from collections import Counter
 
-# Test discover_heuristics_net
+
+# Test compute_length2_loops and compute_length2_dependency
 if __name__ == "__main__":
+    traces = [
+        ['A', 'X', 'B'],
+        ['A', 'Y', 'B'],
+        ['B', 'Z', 'A'],
+        ['A', 'W', 'C'],
+    ]
+    
+    length2_loops = compute_length2_loops(traces)
+    
+    # A→B appears 2 times (via X and Y), B→A appears 1 time (via Z), A→C appears 1 time (via W)
+    assert length2_loops[('A', 'B')] == 2
+    assert length2_loops[('B', 'A')] == 1
+    assert length2_loops[('A', 'C')] == 1
+    
+    # Test length-2 dependency: (2+1)/(2+1+1) = 3/4 = 0.75
+    normal_pairs = Counter()
+    dep_ab = compute_length2_dependency('A', 'B', normal_pairs, length2_loops)
+    assert abs(dep_ab - 0.75) < 0.001
+    
+    # Test length-2 dependency: (1+2)/(1+2+1) = 3/4 = 0.75 (symmetric)
+    dep_ba = compute_length2_dependency('B', 'A', normal_pairs, length2_loops)
+    assert abs(dep_ba - 0.75) < 0.001
+    
+    print("test passed")
+
     import pandas as pd
     
     df = pd.DataFrame({
@@ -242,5 +306,26 @@ if __name__ == "__main__":
     assert len(net.places) >= 4  # Edge places + source + sink
     assert len(initial_marking) == 1
     assert len(final_marking) == 1
+    
+    print("test passed")
+
+    normal_pairs = Counter({('A', 'B'): 5, ('B', 'A'): 2})
+    self_loops = Counter()
+    length2_loops = Counter({('A', 'C'): 4, ('C', 'A'): 3})
+    
+    # A→B passes direct dependency filter
+    # A→C fails direct (not in normal_pairs) but passes length-2 (dep=0.875)
+    edges = filter_dependencies(normal_pairs, self_loops, dep_threshold=0.5, freq_threshold=2,
+                               relative_to_best=0.05, length2_loops=length2_loops, length2_threshold=0.5)
+    
+    assert len(edges) == 2
+    assert ('A', 'B', 0.375) in edges or any(e[0] == 'A' and e[1] == 'B' for e in edges)
+    
+    found_ac = False
+    for a, b, dep in edges:
+        if a == 'A' and b == 'C':
+            found_ac = True
+            assert abs(dep - 0.875) < 0.001  # (4+3)/(4+3+1) = 7/8
+    assert found_ac
     
     print("test passed")
