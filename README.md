@@ -58,6 +58,9 @@ This runs the complete pipeline:
 ### Run a single miner
 
 ```bash
+# Alpha Miner only (saves JSON summary + PNG visualization)
+python src/run_alpha.py
+
 # Heuristics Miner only
 python run_sepsis.py
 
@@ -97,12 +100,14 @@ heuristics     0.89       0.53            0.81        0.87
 
 All results are saved to the `results/` directory:
 
-| File | Contents |
-|---|---|
-| `model_comparison.csv` | Fitness/precision/generalization/simplicity per miner |
-| `log_statistics.json` | Event log statistics (cases, events, activities, durations) |
-| `heuristics_model_summary.json` | Heuristics Miner model (edges, split types, thresholds) |
-| `inductive_model_summary.json` | Inductive Miner model (cuts, components) |
+| File | Written by | Contents |
+|---|---|---|
+| `results/metrics.csv` | `main.py` | Fitness/precision/generalization/simplicity per miner |
+| `results/log_statistics.csv` | `main.py` | Event log statistics (cases, events, activities, durations) |
+| `results/alpha_model_summary.json` | `src/run_alpha.py` | Alpha Miner model (places, transitions, arcs) |
+| `results/alpha_petri_net.png` | `src/run_alpha.py` | Alpha Miner Petri net visualization |
+| `results/heuristics_model_summary.json` | `run_sepsis.py` | Heuristics Miner model (edges, split types, thresholds) |
+| `results/inductive_model_summary.json` | `src/run_inductive_miner.py` | Inductive Miner model (cuts, components) |
 
 ---
 
@@ -117,6 +122,7 @@ ProcessDiscovery/
 │   ├── alpha_miner.py            # Alpha Miner implementation
 │   ├── heuristics_miner.py       # Heuristics Miner implementation
 │   ├── inductive_miner.py        # Inductive Miner implementation
+│   ├── run_alpha.py              # Entry point for Alpha Miner
 │   └── run_inductive_miner.py    # Entry point for Inductive Miner
 ├── main.py                       # Full pipeline (all miners + evaluation)
 ├── run_sepsis.py                 # Entry point for Heuristics Miner
