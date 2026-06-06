@@ -1,4 +1,6 @@
+import pandas as pd
 import pm4py
+import json
 from src.heuristics_miner import (
     discover_heuristics_net,
     extract_traces,
@@ -29,3 +31,19 @@ print(f"Arcs: {len(net.arcs)}")
 print(f"Start activities: {len(start_activities)} ({list(start_activities.keys())})")
 print(f"End activities: {len(end_activities)} ({list(end_activities.keys())})")
 print(f"Filtered edges: {len(edges)}")
+
+# Save results to JSON
+results = {
+    'places': len(net.places),
+    'transitions': len(net.transitions),
+    'arcs': len(net.arcs),
+    'start_activities': list(start_activities.keys()),
+    'end_activities': list(end_activities.keys()),
+    'filtered_edges': len(edges),
+    'edges': [{'from': a, 'to': b, 'dependency': d} for a, b, d in edges]
+}
+
+with open('results/heuristics_model_summary.json', 'w') as f:
+    json.dump(results, f, indent=2)
+
+print("\nResults saved to results/heuristics_model_summary.json")
